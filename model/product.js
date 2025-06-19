@@ -6,9 +6,10 @@ class Product {
     _screen,
     _blackCamera,
     _frontCamera,
+    _type,
     _img,
-    _description,
-    _type
+    _description
+  
   ) {
     this.id=_id;
     this.name=_name;
@@ -16,9 +17,9 @@ class Product {
     this.screen=_screen;
     this.blackCamera=_blackCamera;
     this.frontCamera=_frontCamera;
+    this.type=_type;
     this.img=_img;
     this.description=_description;
-    this.type=_type;
   }
 }
 export default Product

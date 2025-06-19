@@ -1,6 +1,7 @@
 import ProductServices from "../model/product-services.js";
 import Product from "../model/product.js";
-const product = new Product();
+import Fillterproduct from "../model/validation.js";
+const validation=new Fillterproduct();
 const productServices = new ProductServices();
 const geID = (id) => document.getElementById(id);
 const getListProductApi = () => {
@@ -65,7 +66,6 @@ window.toggleModal = toggleModal;
 
 document.getElementById("btnThemSP").onclick = function () {
   document.getElementById("modal-title").innerText = "Add Product";
-
   const btnAdd = `<button style="
       color: white;
       background: linear-gradient(to right, #3b82f6, #2563eb, #1e40af);
@@ -76,36 +76,50 @@ document.getElementById("btnThemSP").onclick = function () {
       margin-right: 8px;
       border: none;" onclick="onAddProduct()"> Add </button>`;
   document.getElementsByClassName("btnThem")[0].innerHTML = btnAdd;
-
   toggleModal();
 };
 const getValue = () => {
   const name = geID("name").value;
   const price = geID("price").value;
-  const screen = geID("screen").value;
-  const backCamera = geID("backCamera").value;
-  const frontCamera = geID("frontCamera").value;
+  const screen = geID("screns").value;
+  const backCamera = geID("balckcamera").value;
+  const frontCamera = geID("froncamera").value;
   const type = geID("category").value;
   const img = geID("images").value;
   const desc = geID("description").value;
-
-  return new Product("", name, price, screen, backCamera, frontCamera, type, img, desc);
+let isValid=true;
+isValid&=validation.checkEmpty(name,"tbName","(*) vui long nhap ten san pham")
+if(!isValid) return ;
+  return new Product(
+    "",
+    name,
+    price,
+    screen,
+    backCamera,
+    frontCamera,
+    type,
+    img,
+    desc
+  );
 };
-
 const onAddProduct = () => {
-  const product = getValue(); // ✅ lấy dữ liệu từ form
+  const product = getValue();
+  if(!product) return;
   const promise = productServices.addProductApi(product);
   promise
     .then((result) => {
       alert(`Add product ${result.data.name} success!`);
-      toggleModal(); // Ẩn modal
-      getListProductApi(); // Refresh lại danh sách
+      toggleModal();
+      resetFrom();
+      getListProductApi();
     })
     .catch((error) => {
       console.log(error);
     });
 };
-
+const resetFrom=()=>{
+  geID("productFrom").reset();
+}
 getListProductApi();
 const onDeleate = (id) => {
   console.log(id);
@@ -145,20 +159,21 @@ const onEdtit = (id) => {
                        box-shadow: 2px 4px 6px rgba(59, 130, 246, 0.5);
                        cursor: pointer;
                        margin-right: 8px;
-                       border: none;" onclick="onUpdateProduct('${id}')">Update</button>`;
+                       border: none;" onclick="onUpdateProduct(event,'${id}')">Update</button>`;
 
   document.getElementsByClassName("btnThem")[0].innerHTML = btnUpdate;
-  toggleModal(); 
+  toggleModal();
 };
 
-const onUpdateProduct = (id) => {
+const onUpdateProduct = (e, id) => {
+  e.preventDefault();
   const product = getValue();
   product.id = id;
   const promise = productServices.updateProductApi(product);
   promise
     .then((result) => {
       alert(`Update${result.data.name} success!`);
-      document.getElementById("crud-modal")[0].click();
+      document.getElementById("crud-modal").click();
       getListProductApi();
     })
     .catch((error) => {
